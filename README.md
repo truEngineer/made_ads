@@ -1,2 +1,1 @@
-# made_ads
-MADE Algorithms and Data Structures
+# MADE Algorithms and Data Structures
