@@ -1,52 +1,68 @@
-def find_max_path(mat, n, m):
-    res = -1
-    for i in range(m):
-        res = max(res, mat[0][i])
-
-    for i in range(1, n):
-        res = -1
-        for j in range(m):
-            # When all paths are possible
-            if 0 < j < m - 1:
-                mat[i][j] += max(mat[i - 1][j], max(mat[i - 1][j - 1], mat[i - 1][j + 1]))
-            # When diagonal right is not possible
-            elif j > 0:
-                mat[i][j] += max(mat[i - 1][j], mat[i - 1][j - 1])
-            # When diagonal left is not possible
-            elif j < m - 1:
-                mat[i][j] += max(mat[i - 1][j], mat[i - 1][j + 1])
-            # Store max path sum
-            res = max(mat[i][j], res)
-    return res
-
-
-# Bottom-up function to count all paths from the first cell (0,0)
-# to the last cell (M-1,N-1) in a given M x N rectangular grid
-def countPaths(m, n):
-    #  T[i][j] stores the number of paths from cell (0,0) to cell (i,j)
-    T = [[0 for x in range(n)] for y in range(m)]
-    # There is only one way to reach any cell in the first column i.e. to move down
-    for i in range(m):
-        T[i][0] = 1
-    # There is only one way to reach any cell in the first row i.e. to move right
-    for j in range(n):
-        T[0][j] = 1
-
-    # fill T in bottom-up manner
-    for i in range(1, m):
-        for j in range(1, n):
-            T[i][j] = T[i-1][j] + T[i][j-1]
-
-    # last cell of T stores the count of paths from cell(0,0) to cell(i,j)
-    return T[m-1][n-1]
-
-
-# Driver program to check findMaxPath
-#N = 4
-#M = 6
-mat = ([[10, 10, 2, 0, 20, 4],
-        [1, 0, 0, 30, 2, 5],
-        [0, 10, 4, 0, 2, 0],
-        [1, 0, 2, 20, 0, 4]])
-
-print(find_max_path(mat, 4, 6))
+#include <iostream>
+#include <algorithm>
+#include <vector>
+ 
+ 
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+ 
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<char> answer;
+    std::vector<std::vector<int>> cur(n, std::vector<int>(m, 1));
+    std::vector<std::vector<int>> cnt(n, std::vector<int>(m, 0));
+ 
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            std::cin >> cur[i][j];
+        }
+    }
+ 
+    cnt[0][0] = cur[0][0];
+    for (int i = 1; i < m; ++i) {
+        cnt[0][i] = cnt[0][i - 1] + cur[0][i];
+    }
+ 
+    for (int i = 1; i < n; ++i) {
+        cnt[i][0] = cnt[i - 1][0] + cur[i][0];
+    }
+ 
+    for (int i = 1; i < n; ++i) {
+        for (int j = 1; j < m; ++j) {
+            if (cnt[i][j - 1] >= cnt[i - 1][j]) {
+                cnt[i][j] = cur[i][j] + cnt[i][j - 1];
+            } else {
+                cnt[i][j] = cur[i][j] + cnt[i - 1][j];
+            }
+        }
+    }
+ 
+    int i = n - 1;
+    int j = m - 1;
+    while (i > 0 && j > 0) {
+        if (cnt[i][j - 1] > cnt[i - 1][j]) {
+            answer.push_back('R');
+            j -= 1;
+        } else {
+            answer.push_back('D');
+            i -= 1;
+        }
+    }
+    while (i > 0) {
+        answer.push_back('D');
+        i -= 1;
+    }
+    while (j > 0) {
+        answer.push_back('R');
+        j -= 1;
+    }
+ 
+    std::cout << cnt[n - 1][m - 1] << std::endl;
+    for (int k = answer.size() - 1; k >= 0; --k) {
+        std::cout << answer[k];
+    }
+ 
+    return 0;
+}
