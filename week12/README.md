@@ -43,9 +43,6 @@ get 5
 1 5 5
 ```
 
-### Примечание
-CHM (Cheriyan, Hagerup & Mehlhorn).
-
 
 
 
@@ -99,4 +96,4 @@ get 3
 ```
 
 ### Примечание
-CHM (Cheriyan, Hagerup & Mehlhorn).
+Задача на применение CHM.
