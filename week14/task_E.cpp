@@ -2,13 +2,35 @@
 #include <vector>
 #include <unordered_set>
  
-const int PRIME = 1123;
+const int PRIME = 101;
 const int LEN = 10001;
 const int INF = INT_MAX;
  
 std::vector<std::vector<int>> h;
 std::vector<std::string> str;
 std::vector<int> p(LEN);
+int l, r;
+ 
+void init(int k) {
+    h.resize(k);
+    str.resize(k);
+    p[0] = 1;
+    for (int i = 1; i < LEN; ++i) {
+        p[i] = PRIME * p[i - 1];
+    }
+    l = -1;
+    r = INF;
+    for (int i = 0; i < k; ++i) {
+        std::cin >> str[i];
+        auto s = str[i];
+        r = std::min(r, (int)s.size() + 1);
+        h[i].resize(s.size() + 1);
+        h[i][0] = 0;
+        for (int j = 1; j < h[i].size(); ++j) {
+            h[i][j] = h[i][j - 1] * PRIME + s[j - 1];
+        }
+    }
+}
  
 std::string find_common_substr(int l) {
     std::unordered_set<int> set;
@@ -34,31 +56,7 @@ std::string find_common_substr(int l) {
     return ans;
 }
  
-int main() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    std::cout.tie(nullptr);
- 
-    int k;
-    std::cin >> k;
-    h.resize(k);
-    str.resize(k);
-    p[0] = 1;
-    for (int i = 1; i < LEN; ++i) {
-        p[i] = PRIME * p[i - 1];
-    }
-    int l = -1;
-    int r = INF;
-    for (int i = 0; i < k; ++i) {
-        std::cin >> str[i];
-        auto s = str[i];
-        r = std::min(r, (int)s.size() + 1);
-        h[i].resize(s.size() + 1);
-        h[i][0] = 0;
-        for (int j = 1; j < h[i].size(); ++j) {
-            h[i][j] = h[i][j - 1] * PRIME + s[j - 1];
-        }
-    }
+std::string find_max_common_substr() {
     std::string res;
     while (r - l > 1) {
         int m = (l + r) / 2;
@@ -70,7 +68,18 @@ int main() {
             r = m;
         }
     }
-    std::cout << res;
+    return res;
+}
+ 
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+ 
+    int k;
+    std::cin >> k;
+    init(k);
+    std::cout << find_max_common_substr();
  
     return 0;
 }
