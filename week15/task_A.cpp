@@ -2,62 +2,83 @@
 #include <vector>
 #include <map>
 
-std::map<char, int> toktype;
-std::vector<std::string> lex;
-int cur = 0;
+class Parser {
+private:
+    int cur;
+    std::string s;
+    std::map<char, int> toktype;
+    std::vector<std::string> lex;
 
-int parse_num(const std::string& s) {
-    int ans = 0;
-    while (s[cur] >= '0' and s[cur] <= '9') {
-        ans = 10 * ans + (s[cur] - '0');
-        cur++;
+    int parse_num() {
+        int ans = 0;
+        while (s[cur] >= '0' and s[cur] <= '9') {
+            ans = 10 * ans + (s[cur] - '0');
+            cur++;
+        }
+        lex.push_back(std::to_string(ans));
+        return ans;
     }
-    lex.push_back(std::to_string(ans));
-    return ans;
-}
-
-int parse_sum(const std::string& s);
-
-int parse_mult(const std::string& s) {
-    int ans;
-    if (s[cur] == '(') {
-        lex.push_back(std::string(1, s[cur]));
-        cur++;
-        ans = parse_sum(s);
-        lex.push_back(std::string(1, s[cur]));
-        cur++;
-    } else {
-        ans = parse_num(s);
-    }
-    while (s[cur] == '*') {
-        lex.push_back(std::string(1, s[cur]));
-        cur++;
-        int ret;
+    
+    int parse_mult() {
+        int ans;
         if (s[cur] == '(') {
             lex.push_back(std::string(1, s[cur]));
             cur++;
-            ret = parse_sum(s);
+            ans = parse_sum();
             lex.push_back(std::string(1, s[cur]));
             cur++;
         } else {
-            ret = parse_num(s);
+            ans = parse_num();
         }
-        ans *= ret;
+        while (s[cur] == '*') {
+            lex.push_back(std::string(1, s[cur]));
+            cur++;
+            int ret;
+            if (s[cur] == '(') {
+                lex.push_back(std::string(1, s[cur]));
+                cur++;
+                ret = parse_sum();
+                lex.push_back(std::string(1, s[cur]));
+                cur++;
+            } else {
+                ret = parse_num();
+            }
+            ans *= ret;
+        }
+        return ans;
     }
-    return ans;
-}
+    
+    int parse_sum() {
+        int ans = parse_mult();
+        while (s[cur] == '+' or s[cur] == '-') {
+            int k = (s[cur] == '+' ? 1 : -1);
+            lex.push_back(std::string(1, s[cur]));
+            cur++;
+            int ret = parse_mult();
+            ans += k * ret;
+        }
+        return ans;
+    }
 
-int parse_sum(const std::string& s) {
-    int ans = parse_mult(s);
-    while (s[cur] == '+' or s[cur] == '-') {
-        int k = (s[cur] == '+' ? 1 : -1);
-        lex.push_back(std::string(1, s[cur]));
-        cur++;
-        int ret = parse_mult(s);
-        ans += k * ret;
+public:
+    Parser(std::string s): cur(0), s(s) {
+        for (char c = '0'; c <= '9'; ++c) {
+            toktype[c] = 1;
+        }
+        toktype['+'] = 2;
+        toktype['-'] = 2;
+        toktype['*'] = 2;
+        toktype['('] = 3;
+        toktype[')'] = 3;
     }
-    return ans;
-}
+
+    void parse() {
+        int ans = parse_sum();
+        for (auto ch : lex) {
+            std::cout << ch << '\n';
+        }
+    }
+};
 
 int main() {
     std::ios_base::sync_with_stdio(false);
@@ -66,20 +87,8 @@ int main() {
 
     std::string s;
     std::cin >> s;
-    s.pop_back();
-    for (char c = '0'; c <= '9'; ++c) {
-        toktype[c] = 1;
-    }
-    toktype['+'] = 2;
-    toktype['-'] = 2;
-    toktype['*'] = 2;
-    toktype['('] = 3;
-    toktype[')'] = 3;
-    int ans = parse_sum(s);
-    //std::cout << "res:" << ans << '\n';
-    for (auto ch : lex) {
-        std::cout << ch << '\n';
-    }
+    Parser p = Parser(s);
+    p.parse();
 
     return 0;
 }
