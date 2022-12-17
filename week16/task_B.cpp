@@ -1,39 +1,71 @@
 #include <iostream>
+#include <algorithm>
 #include <cmath>
  
-typedef long long ll;
+template<typename T>
+struct point_t {
+    T x, y;
  
-int sgn(ll n) {
-    return (n > 0) - (n < 0);
+    T operator^(point_t const &other) const {
+        return x * other.y - y * other.x;
+    }
+ 
+    point_t operator-(point_t const &other) const {
+        return point_t{x - other.x, y - other.y};
+    }
+};
+ 
+template<typename T>
+std::istream &operator>>(std::istream &in, point_t<T> &p) {
+    return in >> p.x >> p.y;
 }
  
-int RectanglesIntersects(ll x1, ll y1, ll x2, ll y2, ll x3, ll y3, ll x4, ll y4) {
-    if (sgn(x3 - x2) * sgn(x4 - x1) > 0) return 0;
-    if (sgn(y3 - y2) * sgn(y4 - y1) > 0) return 0;
-    return 1;
+typedef point_t<int> point;
+ 
+struct segment {
+    point p1, p2;
+ 
+    bool contains(point const &p) const {
+        int x1 = p1.x, y1 = p1.y;
+        int x2 = p2.x, y2 = p2.y;
+        if (x2 < x1) {
+            std::swap(x1, x2);
+        }
+        if (y2 < y1) {
+            std::swap(y2, y1);
+        }
+        return (x1 <= p.x && p.x <= x2 && y1 <= p.y && p.y <= y2);
+    }
+};
+ 
+int sign(int const &value) {
+    return (value == 0 ? 0 : (value > 0 ? 1 : -1));
 }
  
-int intersect(ll x1, ll y1, ll x2, ll y2, ll x3, ll y3, ll x4, ll y4) {
-    ll ABx, ABy, ACx, ACy, ADx, ADy;
-    ll CAx, CAy, CBx, CBy, CDx, CDy;
-    ll ACxAB, ADxAB, CAxCD, CBxCD;
-    if (!RectanglesIntersects(std::min(x1, x2), std::min(y1, y2), 
-                              std::max(x1, x2), std::max(y1, y2), 
-                              std::min(x3, x4), std::min(y3, y4), 
-                              std::max(x3, x4), std::max(y3, y4))) return 0;
-    ACx = x3 - x1; ACy = y3 - y1; 
-    ABx = x2 - x1; ABy = y2 - y1;
-    ADx = x4 - x1; ADy = y4 - y1;
-    CAx = x1 - x3; CAy = y1 - y3; 
-    CBx = x2 - x3; CBy = y2 - y3;
-    CDx = x4 - x3; CDy = y4 - y3;
-    ACxAB = ACx * ABy - ACy * ABx;
-    ADxAB = ADx * ABy - ADy * ABx;
-    CAxCD = CAx * CDy - CAy * CDx;
-    CBxCD = CBx * CDy - CBy * CDx;
-    if ((sgn(ACxAB) * sgn(ADxAB) > 0) || (sgn(CAxCD) * sgn(CBxCD) > 0)) return 0;
-    
-    return 1;
+int orientation(point const &top, point const &a, point const &b) {
+    return (a - top) ^ (b - top);
+}
+ 
+int over_segment(segment const &s1, segment const &s2) {
+    int sign1 = sign(orientation(s1.p1, s1.p2, s2.p1));
+    int sign2 = sign(orientation(s1.p1, s1.p2, s2.p2));
+    if (sign1 == 0 && sign2 == 0) {
+        return 0;
+    } else {
+        return sign1 == sign2 ? 1 : -1;
+    }
+}
+ 
+bool intersects(segment const &s1, segment const &s2) {
+    int over_s1 = over_segment(s1, s2);
+    int over_s2 = over_segment(s2, s1);
+    if (over_s1 == -1 && over_s2 == -1) {
+        return true;
+    } else if (over_s1 == 1 || over_s2 == 1) {
+        return false;
+    } else {
+        return s1.contains(s2.p1) || s1.contains(s2.p2) || s2.contains(s1.p1) || s2.contains(s1.p2);
+    }
 }
  
 int main() {
@@ -41,10 +73,10 @@ int main() {
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
  
-    ll x1, y1, x2, y2, x3, y3, x4, y4;
-    std::cin >> x1 >> y1 >> x2 >> y2;
-    std::cin >> x3 >> y3 >> x4 >> y4;
-    std::cout << (intersect(x1, y1, x2, y2, x3, y3, x4, y4) ? "YES" : "NO");
-    
+    point p1, p2, p3, p4;
+    std::cin >> p1 >> p2;
+    std::cin >> p3 >> p4;
+    std::cout << (intersects(segment{p1, p2}, segment{p3, p4}) ? "YES\n" : "NO\n");
+ 
     return 0;
 }
