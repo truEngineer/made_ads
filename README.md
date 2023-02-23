@@ -15,4 +15,4 @@
 13. [Графы 4 (потоки)](https://github.com/truEngineer/made_ads/tree/main/week13) 🌊
 14. [Базовые алгоритмы на строках](https://github.com/truEngineer/made_ads/tree/main/week14) 🖋
 15. [Парсинг](https://github.com/truEngineer/made_ads/tree/main/week15) 📟
-16. [Базовая вычислительная геометрия](https://github.com/truEngineer/made_ads/tree/main/week15) 📐
+16. [Базовая вычислительная геометрия](https://github.com/truEngineer/made_ads/tree/main/week16) 📐
